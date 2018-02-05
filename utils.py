@@ -14,8 +14,7 @@ n - The nth Aztec diamond in the sequence of Aztec diamonds
 def generate_grid_coord(n):
 	#lazy way of doing this for now
 	xvals = [x for x in range(-(n + 1), n + 2)]
-	yvals = [y for y in range(-(n + 1), n + 2)]
-	return [(x, y) for x in xvals for y in yvals if abs(x) + abs(y) <= n + 1]
+	return [(x, y) for x in xvals for y in xvals if abs(x) + abs(y) <= n + 1]
 
 '''
 Creates the Aztec diamond graph
