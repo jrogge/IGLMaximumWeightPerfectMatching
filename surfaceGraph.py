@@ -24,6 +24,14 @@ class SurfaceGraph:
         self.graph.add_edge((0, self.size), (0, self.size-1))
 
     def draw(self):
+        def draw_aztec_diamond(n):
+	    G, mapping = create_vertex_graph(n)
+	    fig = plt.figure()
+	    ax = fig.gca()
+	    ax.grid(True)
+	    nx.draw_networkx(G, pos=mapping, ax = ax, with_labels = False, node_size = 20)
+	    plt.show()
+
         nx.draw(self.graph, with_labels=True, font_weight='bold')
         pyplot.show()
 
