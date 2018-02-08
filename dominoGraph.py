@@ -15,8 +15,6 @@ class SurfaceGraph:
 		self.G.add_nodes_from(initial_vertices)
 		self.G.add_edges_from(initial_edges)
 
-
-
 		for vertex in initial_vertices:
 			self.mapping[vertex] = vertex
 		for i in range (n - 1):
@@ -64,8 +62,7 @@ class SurfaceGraph:
 			self.G.add_edge(botton_left, (botton_left[0], botton_left[1] - 1))
 			self.mapping[(botton_left[0] - 1, botton_left[1])] = (botton_left[0] - 1, botton_left[1])
 			self.mapping[(botton_left[0], botton_left[1] - 1)] = (botton_left[0], botton_left[1] - 1)
-
-
+			
 		self.n += 1
 		#connect middle nodes
 		self.G.add_edge((0.5, self.n - 0.5), (-0.5, self.n - 0.5))
