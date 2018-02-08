@@ -15,8 +15,9 @@ class VertexGraph:
 		
 		for i in range (-1, n):
 			self.add_layer()
-
-	#adds a layer to our diamond and increments count
+	'''
+	Adds a layer to our diamond and increments count
+	'''
 	def add_layer(self):
 		self.n += 1
 		#add the points on the x and y axis
@@ -50,7 +51,17 @@ class VertexGraph:
 			self.G.add_edge((-i, -self.n + i - 1), (-i + 1, -self.n + i - 1))
 			self.G.add_edge((-i, -self.n + i - 1), (-i, -self.n + i))
 
-	#plots the figure and displays it
+
+	'''
+	Given an edge, removes the two associated edges
+	'''
+	def remove_edge(self, e):
+		u, v = e
+		self.G.remove_edge(u, v)
+
+	'''
+	Plots the figure and displays it
+	'''
 	def draw(self):
 		fig = plt.figure()
 		ax = fig.gca()
@@ -58,5 +69,5 @@ class VertexGraph:
 		nx.draw_networkx(self.G, pos=self.mapping, ax = ax, with_labels = False, node_size = 20)
 		plt.show()
 
-G = VertexGraph(10)
-G.draw()
+#G = VertexGraph(10)
+#G.draw()
