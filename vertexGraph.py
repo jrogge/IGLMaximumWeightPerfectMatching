@@ -1,5 +1,6 @@
-import networkx as nx
 import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Object for Aztec diamond vertex graph
@@ -58,6 +59,84 @@ class VertexGraph:
 	def remove_edge(self, e):
 		u, v = e
 		self.G.remove_edge(u, v)
+
+	'''
+	Given a matching, defines the height function at every point starting from (n + 1, 0) with the center of the counter-clockwise
+	(black) square fixed at (n - 1/2, 1/2)
+	The matching comes in as a data structure
+	'''
+	def height_map(self, matching):
+		X = np.zeros(self.G.number_of_nodes())
+		Y = np.zeros(self.G.number_of_nodes())
+		Z = np.zeros(self.G.number_of_nodes())
+		return self.height_wrap(matching, X, Y, Z, self.n, 0, self.n + 1, 0, 0)
+	
+	def height_wrap(self, matching, X, Y, Z, n, h, curX, curY, count):
+		if((curX, curY) == (0,0)):
+			X[count] = curX
+			Y[count] = curY
+			Z[count] = h
+			return X, Y, Z
+
+		X, Y, Z, h, curX, curY, count = self.traverse(matching, X, Y, Z, n, h, curX, curY, count, -1, 1)
+		return self.height_wrap(matching, X, Y, Z, n - 2, h, curX - 1, 0, count)
+
+	'''
+	Helper function to traverse each layer of the Aztec diamond
+	'''
+	def traverse(self, matching, X, Y, Z, n, h, curX, curY, count, dirX, dirY):
+		if(n < 0):
+			return X, Y, Z, h, curX, curY, count
+		X[count] = curX
+		Y[count] = curY
+		Z[count] = h
+		count += 1
+		
+		if (dirX == -1 and dirY == 1) or (dirX == 1 and dirY == -1):
+			#top right of diamond and starting by moving left
+			for i in range(n + 1):
+				h = h + 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h + 1
+				curX += dirX
+				if(i == n - 1):
+					X[count] = curX
+					Y[count] = curY
+					Z[count] = h
+					count+= 1
+				h = h + 3 if ((curX, curY), (curX, curY + dirY)) in matching or ((curX, curY + dirY), (curX, curY)) in matching else h + 1
+				curY += dirY
+				if(i == n - 1):
+					X[count] = curX
+					Y[count] = curY
+					Z[count] = h
+					count += 1
+			if(dirX == -1 and dirY == 1):
+				return self.traverse(matching, X, Y, Z, n, h, curX, curY, count, -1, -1)
+			else:
+				return self.traverse(matching, X, Y, Z, n, h, curX, curY, count, 1, 1)
+		else:
+			for i in range(n + 1):
+				h = h - 3 if ((curX, curY), (curX, curY + dirY)) in matching or ((curX, curY + dirY), (curX, curY)) in matching else h - 1
+				curY += dirY
+				if(i == n - 1):
+					X[count] = curX
+					Y[count] = curY
+					Z[count] = h
+					count += 1
+				h = h - 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h - 1
+				curX += dirX
+				if(i == n - 1):
+					X[count] = curX
+					Y[count] = curY
+					Z[count] = h
+					count+= 1
+			if(dirX == -1 and dirY == -1):
+				return self.traverse(matching, X, Y, Z, n, h, curX, curY, count, 1, -1)
+			else:
+				h = h + 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h + 1
+				curX -= 1 #(at (n, 0))
+				h = h + 3 if ((curX, curY), (curX - 1, curY)) in matching or ((curX - 1, curY), (curX, curY)) in matching else h + 1
+				return X, Y, Z, h, curX, curY, count
+
 
 	'''
 	Plots the figure and displays it
