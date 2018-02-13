@@ -16,15 +16,15 @@ def visualize(n):
 		vg.remove_edge(edge)
 	vg.draw()
 
-
+'''
+Displays the height function of the Aztec diamond with fixed point and black square
+See vertexGraphs height map function for more details
+'''
 def height(n):
 	dg = dominoGraph.DominoGraph(n)
 	vg = vertexGraph.VertexGraph(n)
 	avoid_edges = dg.get_avoid_edges()
 	X, Y, Z = vg.height_map(avoid_edges)
-	
-	for i in range(len(X)):
-		print(X[i], Y[i], Z[i])
 
 	fig = plt.figure()
 	ax = fig.gca(projection='3d')
@@ -32,5 +32,5 @@ def height(n):
 	plt.show()
 
 
-#visualize(2)
-height(153)
+#visualize(5)
+height(5)
