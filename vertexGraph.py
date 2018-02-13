@@ -71,19 +71,22 @@ class VertexGraph:
 		Z = np.zeros(self.G.number_of_nodes())
 		return self.height_wrap(matching, X, Y, Z, self.n, 0, self.n + 1, 0, 0)
 	
+	'''
+	Wrapper function for finding the height function of our Aztec diamond via layers
+	'''
 	def height_wrap(self, matching, X, Y, Z, n, h, curX, curY, count):
-		if(curX < 0):
+		if(curX <= 0):
 			X[count] = 0
 			Y[count] = curY
 			Z[count] = h
-			print(h)
 			return X, Y, Z
 
 		X, Y, Z, h, curX, curY, count = self.traverse(matching, X, Y, Z, n, h, curX, curY, count, -1, 1)
-		return self.height_wrap(matching, X, Y, Z, n - 2, h, curX - 1, 0, count)
+		return self.height_wrap(matching, X, Y, Z, n - 2, h, curX, 0, count)
 
 	'''
 	Helper function to traverse each layer of the Aztec diamond
+	The function calls itself to travel each side of the diamond
 	'''
 	def traverse(self, matching, X, Y, Z, n, h, curX, curY, count, dirX, dirY):
 		if(n < 0):
@@ -92,18 +95,18 @@ class VertexGraph:
 		Y[count] = curY
 		Z[count] = h
 		count += 1
-		print(curX, curY, h)
+	
 		if (dirX == -1 and dirY == 1) or (dirX == 1 and dirY == -1):
-			#top right of diamond and starting by moving left
+			#top right of diamond and starting by moving left or bottom left of diamond moving right
 			for i in range(n + 1):
-				h = h + 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h + 1
+				h = h - 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h + 1
 				curX += dirX
 				if(i != n):
 					X[count] = curX
 					Y[count] = curY
 					Z[count] = h
 					count+= 1
-				print(curX, curY, h)
+				
 				h = h - 3 if ((curX, curY), (curX, curY + dirY)) in matching or ((curX, curY + dirY), (curX, curY)) in matching else h + 1
 				curY += dirY
 				if(i != n):
@@ -111,12 +114,13 @@ class VertexGraph:
 					Y[count] = curY
 					Z[count] = h
 					count += 1
-				print(curX, curY, h)
+				
 			if(dirX == -1 and dirY == 1):
 				return self.traverse(matching, X, Y, Z, n, h, curX, curY, count, -1, -1)
 			else:
 				return self.traverse(matching, X, Y, Z, n, h, curX, curY, count, 1, 1)
 		else:
+			#top left of diamond moving down or bottom right moving up
 			for i in range(n + 1):
 				h = h + 3 if ((curX, curY), (curX, curY + dirY)) in matching or ((curX, curY + dirY), (curX, curY)) in matching else h - 1
 				curY += dirY
@@ -125,22 +129,26 @@ class VertexGraph:
 					Y[count] = curY
 					Z[count] = h
 					count += 1
-				print(curX, curY, h)
-				h = h - 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h - 1
+				
+				h = h + 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h - 1
 				curX += dirX
 				if(i != n):
 					X[count] = curX
 					Y[count] = curY
 					Z[count] = h
 					count+= 1
-				print(curX, curY, h)
+				
 			if(dirX == -1 and dirY == -1):
 				return self.traverse(matching, X, Y, Z, n, h, curX, curY, count, 1, -1)
 			else:
-				if(n != 0):
-					h = h + 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h + 1
+				#fourth side of diamond, finish
 				curX -= 1 #(at (n, 0))
-				h = h + 3 if ((curX, curY), (curX - 1, curY)) in matching or ((curX - 1, curY), (curX, curY)) in matching else h + 1
+				h = h - 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h + 1
+	
+				if(n != 0):
+					curX -= 1 #(at (n - 1, 0))
+					h = h + 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h - 1
+			
 				return X, Y, Z, h, curX, curY, count
 
 
