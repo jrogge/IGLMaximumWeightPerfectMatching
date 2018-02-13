@@ -1,8 +1,8 @@
 import dominoGraph
 import vertexGraph
-import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 
 '''
 Function to visualize the domino tiling on our Aztec diamond
@@ -28,7 +28,7 @@ def height(n):
 
 	fig = plt.figure()
 	ax = fig.gca(projection='3d')
-	ax.plot_trisurf(X, Y, Z, linewidth=0.2, antialiased=True)
+	ax.plot_trisurf(X, Y, Z, linewidth=0.2, antialiased=True, shade=True, cmap=cm.coolwarm)
 	plt.show()
 
 
