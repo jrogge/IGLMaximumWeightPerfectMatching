@@ -21,7 +21,7 @@ Displays the height function of the Aztec diamond with fixed point and black squ
 See vertexGraphs height map function for more details
 '''
 def height(n):
-	dg = dominoGraph.DominoGraph(n)
+	dg = dominoGraph.DominoGraph(n, weighted=False)
 	vg = vertexGraph.VertexGraph(n)
 	avoid_edges = dg.get_avoid_edges()
 	X, Y, Z = vg.height_map(avoid_edges)
