@@ -1,39 +1,118 @@
+import matplotlib.pyplot as plt
 import networkx as nx
-import matplotlib.pyplot as pyplot
+from networkx.algorithms import bipartite
 
-class SurfaceGraph:
-    def __init__(self, size):
-        self.graph = nx.Graph()
-        self.graph.add_node((0,0))
-        self.size = 0
-        for i in xrange(self.size, size):
-            self.add_layer()
+'''''''''''''''''''''''''''''''''''''''
+Surface graph for the Aztec diamond
+Use to find maximum weighted perfect matching
+'''''''''''''''''''''''''''''''''''''''
+class DominoGraph:
+	def __init__(self, n, weighted=False):
+		self.n = 1
+		self.G = nx.Graph()
+		self.mapping = dict()
+		self.weighted = weighted
+		initial_vertices = [(-0.5, -0.5), (-0.5, 0.5), (0.5, -0.5), (0.5, 0.5)]
+		initial_edges = [((-0.5, -0.5), (-0.5, 0.5)), ((-0.5, -0.5),(0.5, -0.5)), ((0.5, -0.5), (0.5, 0.5)), ((-0.5, 0.5), (0.5, 0.5))]
+		self.G.add_nodes_from(initial_vertices)
+		self.G.add_edges_from(initial_edges)
 
-    def add_layer(self):
-        self.size += 1
-        self.graph.add_node((0,-self.size)) # nodes at top or bottom of graph
-        self.graph.add_edge((0,-self.size), (0, 1 - self.size)) # connecting edge
-        for i in xrange(1 - self.size, self.size - 1): # nodes between top and bottom
-            # nodes on right edge of diamond
-            self.graph.add_node((i, self.size-i))
-            self.graph.add_edge((i-1, self.size-i), (i, self.size-i))
-            # nodes on left edge of diamond
-            self.graph.add_node((-i, self.size-i))
-            self.graph.add_edge((1-i, self.size-i), (-i, self.size-i))
-        self.graph.add_node((0, self.size))
-        self.graph.add_edge((0, self.size), (0, self.size-1))
+		for vertex in initial_vertices:
+			self.mapping[vertex] = vertex
+		for i in range (n - 1):
+			self.add_layer()
 
-    def draw(self):
-        def draw_aztec_diamond(n):
-	    G, mapping = create_vertex_graph(n)
-	    fig = plt.figure()
-	    ax = fig.gca()
-	    ax.grid(True)
-	    nx.draw_networkx(G, pos=mapping, ax = ax, with_labels = False, node_size = 20)
-	    plt.show()
+	'''
+	Adds a layer to our surface graph
+	Can parallelize this eventually
+	'''
+	def add_layer(self):
+		for i in range(0, self.n):
+			top_right = (self.n - (i + 0.5), (i + 0.5))
+			top_left = (-(self.n - (i + 0.5)), (i + 0.5))
+			bottom_right = (self.n - (i + 0.5), -(i + 0.5))
+			botton_left = (-(self.n - (i + 0.5)), -(i + 0.5))
 
-        nx.draw(self.graph, with_labels=True, font_weight='bold')
-        pyplot.show()
+			#top right quadrant
+			self.G.add_node((top_right[0], top_right[1] + 1))
+			self.G.add_node((top_right[0] + 1, top_right[1]))
+			self.G.add_edge(top_right, (top_right[0], top_right[1] + 1))
+			self.G.add_edge(top_right, (top_right[0] + 1, top_right[1]))
+			self.mapping[(top_right[0], top_right[1] + 1)] = (top_right[0], top_right[1] + 1)
+			self.mapping[(top_right[0] + 1, top_right[1])] = (top_right[0] + 1, top_right[1])
 
-test = SurfaceGraph(5)
-test.draw()
+			#top left quadrant
+			self.G.add_node((top_left[0] - 1, top_left[1]))
+			self.G.add_node((top_left[0], top_left[1] + 1))
+			self.G.add_edge(top_left, (top_left[0] - 1, top_left[1]))
+			self.G.add_edge(top_left, (top_left[0], top_left[1] + 1))
+			self.mapping[(top_left[0] - 1, top_left[1])] = (top_left[0] - 1, top_left[1])
+			self.mapping[(top_left[0], top_left[1] + 1)] = (top_left[0], top_left[1] + 1)
+
+			#bottom right quadrant
+			self.G.add_node((bottom_right[0] + 1, bottom_right[1]))
+			self.G.add_node((bottom_right[0], bottom_right[1] - 1))
+			self.G.add_edge(bottom_right, (bottom_right[0] + 1, bottom_right[1]))
+			self.G.add_edge(bottom_right, (bottom_right[0], bottom_right[1] - 1))
+			self.mapping[(bottom_right[0] + 1, bottom_right[1])] = (bottom_right[0] + 1, bottom_right[1])
+			self.mapping[(bottom_right[0], bottom_right[1] - 1)] = (bottom_right[0], bottom_right[1] - 1)
+
+			#botton left quadrant
+			self.G.add_node((botton_left[0] - 1, botton_left[1]))
+			self.G.add_node((botton_left[0], botton_left[1] - 1))
+			self.G.add_edge(botton_left, (botton_left[0] - 1, botton_left[1]))
+			self.G.add_edge(botton_left, (botton_left[0], botton_left[1] - 1))
+			self.mapping[(botton_left[0] - 1, botton_left[1])] = (botton_left[0] - 1, botton_left[1])
+			self.mapping[(botton_left[0], botton_left[1] - 1)] = (botton_left[0], botton_left[1] - 1)
+
+
+		self.n += 1
+		#connect middle nodes
+		self.G.add_edge((0.5, self.n - 0.5), (-0.5, self.n - 0.5))
+		self.G.add_edge((self.n - 0.5, 0.5),((self.n - 0.5), -0.5))
+		self.G.add_edge((-self.n + 0.5, 0.5), ((-self.n + 0.5), -0.5))
+		self.G.add_edge((0.5, -self.n + 0.5), (-0.5, -self.n + 0.5))
+
+	'''
+	Finds a perfect matching. We are assuming the graph is unweighted for now.
+	maxcardinality is set to true for the needs of this project
+	'''
+	def perfect_matching(self):
+		if self.weighted:
+			return nx.max_weight_matching(self.G, maxcardinality = True)
+		else:
+			return bipartite.hopcroft_karp_matching(self.G)
+
+	'''
+	Gets the edges we must avoid in the surface graph.
+	Returns a hashset for good query time
+	'''
+	def get_avoid_edges(self):
+		hs = set()
+		matching = self.perfect_matching()
+		for match in matching:
+			(x1, y1), (x2, y2) = match if self.weighted else (match, matching[match])
+			if(x1 == x2):
+				#vertical edge
+				bigY = y1 if (y1 >= y2) else y2
+				smallY = y1 if (y1 < y2) else y2
+				hs.add(((x1 - 0.5, smallY + 0.5), (x2 + 0.5, bigY - 0.5)))
+			else:
+				#horiztonal edge 
+				bigX = x1 if (x1 >= x2) else x2
+				smallX = x1 if (x1 < x2) else x2
+				hs.add(((smallX + 0.5, y1 - 0.5), (bigX - 0.5, y1 + 0.5)))
+		return hs
+			
+	'''
+	Draws the graph
+	'''
+	def draw(self):
+		fig = plt.figure()
+		ax = fig.gca()
+		ax.grid(True)
+		nx.draw_networkx(self.G, pos= self.mapping, ax = ax, with_labels = False, node_size = 20)
+		plt.show()
+
+#G = DominoGraph(5)
+#G.draw()
