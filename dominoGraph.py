@@ -1,19 +1,33 @@
 import matplotlib.pyplot as plt
 import networkx as nx
+from networkx.algorithms import bipartite
+import random
+
 
 '''''''''''''''''''''''''''''''''''''''
 Surface graph for the Aztec diamond
 Use to find maximum weighted perfect matching
 '''''''''''''''''''''''''''''''''''''''
 class DominoGraph:
-	def __init__(self, n):
+	def __init__(self, n, weighted=False, max_weight=10000):
 		self.n = 1
 		self.G = nx.Graph()
 		self.mapping = dict()
+		self.weighted = weighted
+		self.max_weight = max_weight
 		initial_vertices = [(-0.5, -0.5), (-0.5, 0.5), (0.5, -0.5), (0.5, 0.5)]
-		initial_edges = [((-0.5, -0.5), (-0.5, 0.5)), ((-0.5, -0.5),(0.5, -0.5)), ((0.5, -0.5), (0.5, 0.5)), ((-0.5, 0.5), (0.5, 0.5))]
-		self.G.add_nodes_from(initial_vertices)
-		self.G.add_edges_from(initial_edges)
+		if weighted:
+			self.G.add_edge((-0.5, -0.5), (-0.5, 0.5), weight=random.randint(1, self.max_weight + 1))
+			self.G.add_edge((-0.5, -0.5),(0.5, -0.5), weight=random.randint(1, self.max_weight + 1))
+			self.G.add_edge((0.5, -0.5), (0.5, 0.5), weight=random.randint(1, self.max_weight + 1))
+			self.G.add_edge((-0.5, 0.5), (0.5, 0.5), weight=random.randint(1, self.max_weight + 1))
+		else:
+			self.max_weight = 0
+			self.G.add_edge((-0.5, -0.5), (-0.5, 0.5))
+			self.G.add_edge((-0.5, -0.5),(0.5, -0.5))
+			self.G.add_edge((0.5, -0.5), (0.5, 0.5))
+			self.G.add_edge((-0.5, 0.5), (0.5, 0.5))
+
 
 		for vertex in initial_vertices:
 			self.mapping[vertex] = vertex
@@ -34,49 +48,52 @@ class DominoGraph:
 			#top right quadrant
 			self.G.add_node((top_right[0], top_right[1] + 1))
 			self.G.add_node((top_right[0] + 1, top_right[1]))
-			self.G.add_edge(top_right, (top_right[0], top_right[1] + 1))
-			self.G.add_edge(top_right, (top_right[0] + 1, top_right[1]))
+			self.G.add_edge(top_right, (top_right[0], top_right[1] + 1), weight=random.randint(1, self.max_weight + 1))
+			self.G.add_edge(top_right, (top_right[0] + 1, top_right[1]), weight=random.randint(1, self.max_weight + 1))
 			self.mapping[(top_right[0], top_right[1] + 1)] = (top_right[0], top_right[1] + 1)
 			self.mapping[(top_right[0] + 1, top_right[1])] = (top_right[0] + 1, top_right[1])
 
 			#top left quadrant
 			self.G.add_node((top_left[0] - 1, top_left[1]))
 			self.G.add_node((top_left[0], top_left[1] + 1))
-			self.G.add_edge(top_left, (top_left[0] - 1, top_left[1]))
-			self.G.add_edge(top_left, (top_left[0], top_left[1] + 1))
+			self.G.add_edge(top_left, (top_left[0] - 1, top_left[1]), weight=random.randint(1, self.max_weight + 1))
+			self.G.add_edge(top_left, (top_left[0], top_left[1] + 1),weight=random.randint(1, self.max_weight + 1))
 			self.mapping[(top_left[0] - 1, top_left[1])] = (top_left[0] - 1, top_left[1])
 			self.mapping[(top_left[0], top_left[1] + 1)] = (top_left[0], top_left[1] + 1)
 
 			#bottom right quadrant
 			self.G.add_node((bottom_right[0] + 1, bottom_right[1]))
 			self.G.add_node((bottom_right[0], bottom_right[1] - 1))
-			self.G.add_edge(bottom_right, (bottom_right[0] + 1, bottom_right[1]))
-			self.G.add_edge(bottom_right, (bottom_right[0], bottom_right[1] - 1))
+			self.G.add_edge(bottom_right, (bottom_right[0] + 1, bottom_right[1]), weight=random.randint(1, self.max_weight + 1))
+			self.G.add_edge(bottom_right, (bottom_right[0], bottom_right[1] - 1), weight=random.randint(1, self.max_weight + 1))
 			self.mapping[(bottom_right[0] + 1, bottom_right[1])] = (bottom_right[0] + 1, bottom_right[1])
 			self.mapping[(bottom_right[0], bottom_right[1] - 1)] = (bottom_right[0], bottom_right[1] - 1)
 
 			#botton left quadrant
 			self.G.add_node((botton_left[0] - 1, botton_left[1]))
 			self.G.add_node((botton_left[0], botton_left[1] - 1))
-			self.G.add_edge(botton_left, (botton_left[0] - 1, botton_left[1]))
-			self.G.add_edge(botton_left, (botton_left[0], botton_left[1] - 1))
+			self.G.add_edge(botton_left, (botton_left[0] - 1, botton_left[1]), weight=random.randint(1, self.max_weight + 1))
+			self.G.add_edge(botton_left, (botton_left[0], botton_left[1] - 1), weight=random.randint(1, self.max_weight + 1))
 			self.mapping[(botton_left[0] - 1, botton_left[1])] = (botton_left[0] - 1, botton_left[1])
 			self.mapping[(botton_left[0], botton_left[1] - 1)] = (botton_left[0], botton_left[1] - 1)
 
 
 		self.n += 1
 		#connect middle nodes
-		self.G.add_edge((0.5, self.n - 0.5), (-0.5, self.n - 0.5))
-		self.G.add_edge((self.n - 0.5, 0.5),((self.n - 0.5), -0.5))
-		self.G.add_edge((-self.n + 0.5, 0.5), ((-self.n + 0.5), -0.5))
-		self.G.add_edge((0.5, -self.n + 0.5), (-0.5, -self.n + 0.5))
+		self.G.add_edge((0.5, self.n - 0.5), (-0.5, self.n - 0.5), weight=random.randint(1, self.max_weight + 1))
+		self.G.add_edge((self.n - 0.5, 0.5),((self.n - 0.5), -0.5), weight=random.randint(1, self.max_weight + 1))
+		self.G.add_edge((-self.n + 0.5, 0.5), ((-self.n + 0.5), -0.5), weight=random.randint(1, self.max_weight + 1))
+		self.G.add_edge((0.5, -self.n + 0.5), (-0.5, -self.n + 0.5), weight=random.randint(1, self.max_weight + 1))
 
 	'''
 	Finds a perfect matching. We are assuming the graph is unweighted for now.
 	maxcardinality is set to true for the needs of this project
 	'''
 	def perfect_matching(self):
-		return nx.max_weight_matching(self.G, maxcardinality = True)
+		if self.weighted:
+			return nx.max_weight_matching(self.G, maxcardinality = True)
+		else:
+			return bipartite.hopcroft_karp_matching(self.G)
 
 	'''
 	Gets the edges we must avoid in the surface graph.
@@ -86,7 +103,7 @@ class DominoGraph:
 		hs = set()
 		matching = self.perfect_matching()
 		for match in matching:
-			(x1, y1), (x2, y2) = match
+			(x1, y1), (x2, y2) = match if self.weighted else (match, matching[match])
 			if(x1 == x2):
 				#vertical edge
 				bigY = y1 if (y1 >= y2) else y2
