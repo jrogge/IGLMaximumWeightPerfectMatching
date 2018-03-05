@@ -4,6 +4,7 @@ import time
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
+from multiprocessing import Process
 
 '''
 Function to visualize the domino tiling on our Aztec diamond
@@ -39,13 +40,34 @@ Prints time performance for a graph of size n
 def get_time_performance(n):
 	startTime = time.time()
 	height(n, visual=False, weighted=True, test_time=True)
-	print(time.time() - startTime)
+	print(n, time.time() - startTime)
+
+'''
+Helper function for parallel version. Starts at a base and jumps according to step size
+'''
+def get_time_performance_jumps(base, step_size, maximum):
+	for i in range(base + 1, maximum + 1, step_size):
+		get_time_performance(i)
 
 '''
 Prints time performance on all graphs up to size n
 '''
 def get_time_performances_to(n):
-	for i in range(0, n):
-		get_time_performance(i)
+	get_time_performance_jumps(0, 1, n)
 
-get_time_performances_to(20)
+'''
+Computes time performances in parallel
+'''
+def parallel_time_to(n, num_pool):
+	processes = []
+	for i in range(num_pool):
+		p = Process(target=get_time_performance_jumps, args=(i, num_pool, n))
+		processes.append(p)
+		p.start()
+
+	for p in processes:
+		p.join()
+
+
+#get_time_performances_to(25)
+parallel_time_to(25, 5)
