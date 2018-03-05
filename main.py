@@ -96,15 +96,12 @@ def expected_surface_parallel(n, samples, num_process):
 	rem_process = num_process
 	rem_samples = samples
 	queue = Queue()
-	for i in range(num_process - 1):
+	for i in range(num_process):
 		p = Process(target=expected_surface, args=(n, math.ceil(rem_samples/rem_process), True, queue))
 		rem_samples -= math.ceil(rem_samples/rem_process)
 		rem_process -= 1
 		processes.append(p)
 		p.start()
-	p = Process(target=expected_surface, args=(n, rem_samples, True, queue))
-	processes.append(p)
-	p.start()
 
 	for process in processes:
 		process.join()
