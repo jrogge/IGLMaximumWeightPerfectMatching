@@ -2,9 +2,11 @@ import dominoGraph
 import vertexGraph
 import time
 import matplotlib.pyplot as plt
+import math
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from multiprocessing import Process
+from multiprocessing import Queue
 
 '''
 Function to visualize the domino tiling on our Aztec diamond
@@ -28,13 +30,18 @@ def height(n, weighted=False, visual=False, test_time=False):
 	X, Y, Z = vg.height_map(avoid_edges)
 
 	if not test_time:
-		fig = plt.figure()
-		ax = fig.gca(projection='3d')
-		ax.plot_trisurf(X, Y, Z, linewidth=0.2, antialiased=True, shade=True, cmap=cm.coolwarm)
-		plt.show()
+		plot(X, Y, Z)
+	return X, Y, Z
+
+def plot(X,Y, Z):
+	fig = plt.figure()
+	ax = fig.gca(projection='3d')
+	ax.plot_trisurf(X, Y, Z, linewidth=0.2, antialiased=True, shade=True, cmap=cm.coolwarm)
+	plt.show()
 
 
-'''
+
+'''	
 Prints time performance for a graph of size n
 '''
 def get_time_performance(n):
@@ -58,16 +65,63 @@ def get_time_performances_to(n):
 '''
 Computes time performances in parallel
 '''
-def parallel_time_to(n, num_pool):
+def parallel_time_to(n, num_process):
 	processes = []
-	for i in range(num_pool):
-		p = Process(target=get_time_performance_jumps, args=(i, num_pool, n))
+	for i in range(num_process):
+		p = Process(target=get_time_performance_jumps, args=(i, num_process, n))
 		processes.append(p)
 		p.start()
 
 	for p in processes:
 		p.join()
 
+'''
+Computes the average of the random surfaces according to corresponding values
+'''
+def expected_surface(n, samples, parallel=False, queue=None):
+	X, Y, Z = height(n, weighted=True, test_time=True)
+	for i in range(samples - 1):
+		Xi, Yi, Zi = height(n, weighted=True, test_time=True)
+		Z += Zi
+	if parallel:
+		queue.put((X, Y, Z))
+	else:
+		return X, Y, Z/samples
+
+'''
+Does the expected_surface function in parallel
+'''
+def expected_surface_parallel(n, samples, num_process):
+	processes = []
+	rem_process = num_process
+	rem_samples = samples
+	queue = Queue()
+	for i in range(num_process - 1):
+		p = Process(target=expected_surface, args=(n, math.ceil(rem_samples/rem_process), True, queue))
+		rem_samples -= math.ceil(rem_samples/rem_process)
+		rem_process -= 1
+		processes.append(p)
+		p.start()
+	p = Process(target=expected_surface, args=(n, rem_samples, True, queue))
+	processes.append(p)
+	p.start()
+
+	for process in processes:
+		process.join()
+
+	X, Y, Z = queue.get()
+	while not queue.empty():
+		Xi, Yi, Zi = queue.get()
+		Z += Zi
+	return X, Y, Z/samples
+
 
 #get_time_performances_to(25)
-parallel_time_to(25, 5)
+#parallel_time_to(25, 5)
+#height(17, weighted=True, visual=True)
+#X, Y, Z = expected_surface(10, 50)
+#plot(X, Y, Z)
+X, Y, Z = expected_surface_parallel(10, 50, 5)
+plot(X, Y, Z)
+
+
