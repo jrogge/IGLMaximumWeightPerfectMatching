@@ -85,7 +85,6 @@ def expected_surface(n, samples, parallel=False, queue=None):
 	if parallel:
 		queue.put((X, Y, Z))
 		queue.close()
-		print("bye")
 	else:
 		return X, Y, Z/samples
 
@@ -104,13 +103,12 @@ def expected_surface_parallel(n, samples, num_process):
 		processes.append(p)
 		p.start()
 
-	for process in processes:
-		process.join()
-		print("joined")
+	processes[0].join()
+	X, Y, Z = queue.get()
 
-	X, Y, Z = queue.get_nowait()
-	while not queue.empty():
-		Xi, Yi, Zi = queue.get_nowait()
+	for i in range(1, len(processes)):
+		processes[i].join()
+		Xi, Yi, Zi = queue.get()
 		Z += Zi
 
 	return X, Y, Z/samples
@@ -119,7 +117,7 @@ def expected_surface_parallel(n, samples, num_process):
 #get_time_performances_to(25)
 #parallel_time_to(25, 5)
 #height(17, weighted=True, visual=True)
-#X, Y, Z = expected_surface(10, 50)
+#X, Y, Z = expected_surface(15, 30)
 #plot(X, Y, Z)
 X, Y, Z = expected_surface_parallel(15, 30, 5)
 plot(X, Y, Z)
