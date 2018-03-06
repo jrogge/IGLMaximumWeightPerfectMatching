@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import math
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-from multiprocessing import Process
-from multiprocessing import Queue
+from multiprocessing import Process, Queue
 
 '''
 Function to visualize the domino tiling on our Aztec diamond
@@ -85,6 +84,7 @@ def expected_surface(n, samples, parallel=False, queue=None):
 		Z += Zi
 	if parallel:
 		queue.put((X, Y, Z))
+		return
 	else:
 		return X, Y, Z/samples
 
@@ -103,13 +103,14 @@ def expected_surface_parallel(n, samples, num_process):
 		processes.append(p)
 		p.start()
 
-	for process in processes:
-		process.join()
-
 	X, Y, Z = queue.get()
 	while not queue.empty():
 		Xi, Yi, Zi = queue.get()
 		Z += Zi
+
+	for process in processes:
+		process.join()
+
 	return X, Y, Z/samples
 
 
@@ -118,7 +119,7 @@ def expected_surface_parallel(n, samples, num_process):
 #height(17, weighted=True, visual=True)
 #X, Y, Z = expected_surface(10, 50)
 #plot(X, Y, Z)
-X, Y, Z = expected_surface_parallel(10, 50, 5)
+X, Y, Z = expected_surface_parallel(15, 30, 5)
 plot(X, Y, Z)
 
 
