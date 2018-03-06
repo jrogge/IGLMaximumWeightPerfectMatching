@@ -57,18 +57,34 @@
     
     float specularLightWeightning = pow(rdotv, uShininess);
 
-    if (aVertexPosition.z < 0.3) {
-        calcDiffColor.r = 0.0;
-        calcDiffColor.g = 0.0;
+    if (aVertexPosition.z < 0.15) {
+        calcDiffColor.r = 1.0;
+        calcDiffColor.g = 1.0;
         calcDiffColor.b = 1.0;
-    } else if (aVertexPosition.z < 0.6) {
+    } else if (aVertexPosition.z < 0.3) {
         calcDiffColor.r = 0.0;
         calcDiffColor.g = 1.0;
         calcDiffColor.b = 0.0;
-    } else {
+    } else if (aVertexPosition.z < 0.45) {
+        calcDiffColor.r = 1.0;
+        calcDiffColor.g = 1.0;
+        calcDiffColor.b = 0.0;
+    } else if (aVertexPosition.z < 0.6) {
         calcDiffColor.r = 1.0;
         calcDiffColor.g = 0.0;
         calcDiffColor.b = 0.0;
+    } else if (aVertexPosition.z < 0.75) {
+        calcDiffColor.r = 1.0;
+        calcDiffColor.g = 0.0;
+        calcDiffColor.b = 1.0;
+    } else if (aVertexPosition.z < 0.9) {
+        calcDiffColor.r = 0.0;
+        calcDiffColor.g = 0.0;
+        calcDiffColor.b = 1.0;
+    } else {
+        calcDiffColor.r = 0.0;
+        calcDiffColor.g = 1.0;
+        calcDiffColor.b = 1.0;
     }
 
     //calcDiffColor.r = (aVertexPosition.z*aVertexPosition.z)*0.0 + 2.0 * aVertexPosition.z* (1.0 - aVertexPosition.z)*0.0 + (1.0 - aVertexPosition.z)*(1.0 - aVertexPosition.z)*1.0;

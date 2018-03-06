@@ -1,7 +1,10 @@
+var meshSize = 36;
+/** @global the order of the Aztec diamond we're interested in */
+
+var zRotFactor = 1;
 
 /**
- * @file A simple WebGL example drawing central Illinois style terrain
- * @author Eric Shaffer <shaffer1@illinois.edu>  
+ * @file A simple WebGL example drawing central Illinois style terrain * @author Eric Shaffer <shaffer1@illinois.edu>  
  */
 
 /** @global The WebGL context */
@@ -26,10 +29,13 @@ var nMatrix = mat3.create();
 var mvMatrixStack = [];
 
 /** @global The angle of rotation around the y axis */
-var yRot = 0;
+var yRot = -90;
 
 /** @global The angle of rotation around the x axis */
 var xRot = -90;
+
+/** @global The angle of rotation around the z axis */
+var zRot = -10;
 
 /** @global A glmatrix vector to use for transformations */
 var transformVec = vec3.create();    
@@ -40,18 +46,16 @@ vec3.set(transformVec,0.0,0.0,-2.0);
 /** @global An object holding the geometry for a 3D terrain */
 var myTerrain;
 
-/** @global the order of the Aztec diamond we're interested in */
-var meshSize = 6;
 
 // View parameters
 /** @global Location of the camera in world coordinates */
-var eyePt = vec3.fromValues(0.0,0.0,0.0);
+var eyePt = vec3.fromValues(0.0,0.25,0.0);
 /** @global Direction of the view in world coordinates */
 var viewDir = vec3.fromValues(0.0,0.0,-1.0);
 /** @global Up vector for view matrix creation, in world coordinates */
 var up = vec3.fromValues(0.0,1.0,0.0);
 /** @global Location of a point along viewDir in world coordinates */
-var viewPt = vec3.fromValues(0.0,0.0,0.0);
+var viewPt = vec3.fromValues(0.0,0.25,0.0);
 
 //Light parameters
 /** @global Light position in VIEW coordinates */
@@ -321,6 +325,7 @@ function draw() {
     vec3.set(transformVec,0.0,-0.25,-2.0);
     mat4.translate(mvMatrix, mvMatrix,transformVec);
     mat4.rotateY(mvMatrix, mvMatrix, degToRad(yRot));
+    mat4.rotateZ(mvMatrix, mvMatrix, degToRad(zRot));
     mat4.rotateX(mvMatrix, mvMatrix, degToRad(xRot));
     setMatrixUniforms();
     setLightUniforms(lightPosition,lAmbient,lDiffuse,lSpecular);
@@ -367,7 +372,15 @@ function draw() {
  */
 function tick() {
     requestAnimFrame(tick);
-    yRot += 0.25;
+    //yRot -= 0.25;
+    if (zRot == -45) {
+        zRotFactor = 1;
+    } else if (zRot == 0) {
+        zRotFactor = -1;
+    }
+    zRot += zRotFactor * 0.25;
+
     draw();
 }
+
 

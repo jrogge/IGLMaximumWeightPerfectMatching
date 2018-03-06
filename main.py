@@ -19,16 +19,52 @@ def visualize(dg, vg, avoid_edges):
 	vg.draw()
 
 '''
+Push height data into the javascript file to be visualized
+'''
+def loadData(heights, order):
+        heights = heights[::-1] # necessary because of how the data is stored
+        classFilename = "WebGL/Terrain.js"
+        renderFilename = "WebGL/boilerplate.js"
+
+        # read render file 
+        renderFile = open(renderFilename, "r");
+        renderData = renderFile.read().split("\r\n");
+        renderData[0] = "var meshSize = {};".format(2 * order)
+        # render can be overwritten immediately
+        renderFile.close()
+        renderFile = open(renderFilename, "wb");
+        for line in renderData:
+            renderFile.write(line + "\n")
+        renderFile.close()
+
+        # read class file so we can add height map
+        classFile = open(classFilename, "r");
+        classData = classFile.read().split("\r\n");
+        classFile.close()
+
+        heightData = "var heightMap = ["
+        lastIndex = len(heights)-1
+        for i in xrange(lastIndex):
+                heightData += str(heights[i]) + ", "
+        heightData += str(heights[lastIndex]) + "];"
+        classData[0] = heightData
+        classFile = open(classFilename, "wb");
+        for line in classData:
+            classFile.write(line + "\r\n")
+        classFile.close()
+
+'''
 Displays the height function of the Aztec diamond with fixed point and black square
 See vertexGraphs height map function for more details
 '''
 def height(n, weighted=False, visual=False, test_time=False):
-	dg = dominoGraph.DominoGraph(n, weighted=weighted)
+        dg = dominoGraph.DominoGraph(n, weighted=weighted)
 	vg = vertexGraph.VertexGraph(n)
 	avoid_edges = dg.get_avoid_edges()
 	if visual:
 		visualize(dg, vg, avoid_edges)
 	X, Y, Z = vg.height_map(avoid_edges)
+        loadData(Z, n)
 
 	if not test_time:
 		plot(X, Y, Z)
@@ -121,34 +157,34 @@ def expected_surface_parallel(n, samples, num_process):
 
 #get_time_performances_to(25)
 #parallel_time_to(25, 5)
-#height(17, weighted=True, visual=True)
+height(18, weighted=True, visual=False)
 #X, Y, Z = expected_surface(15, 30)
 #plot(X, Y, Z)
-X, Y, Z = expected_surface_parallel(15, 30, 10)
-plot(X, Y, Z)
-
-
-
-'''
-Graph - Distribution of Heights
-'''
-h = expected_surface_parallel.h
-h = np.sum(h, axis=1)
-fig = plt.figure()
-plt.hist(h)
-plt.title('Distribution of Heights')
-plt.show()
-'''
-Graph - Probability distribution of Heights
-'''
-fig = plt.figure()
-h_sorted = np.sort(h)
-mu = np.mean(h_sorted) 
-sigma = np.std(h_sorted) 
-x = mu + sigma * np.random.randn(10000)
-num_bins = 10
-n, bins, patches = plt.hist(x, num_bins, normed=1, facecolor='orange', alpha=0.75)
-y = mlab.normpdf(bins, mu, sigma)
-l = plt.plot(bins, y, 'r--', linewidth=1)
-plt.title('Probability Distribution of Heights')
-plt.show()
+#X, Y, Z = expected_surface_parallel(15, 30, 10)
+#plot(X, Y, Z)
+#
+#
+#
+#'''
+#Graph - Distribution of Heights
+#'''
+#h = expected_surface_parallel.h
+#h = np.sum(h, axis=1)
+#fig = plt.figure()
+#plt.hist(h)
+#plt.title('Distribution of Heights')
+#plt.show()
+#'''
+#Graph - Probability distribution of Heights
+#'''
+#fig = plt.figure()
+#h_sorted = np.sort(h)
+#mu = np.mean(h_sorted) 
+#sigma = np.std(h_sorted) 
+#x = mu + sigma * np.random.randn(10000)
+#num_bins = 10
+#n, bins, patches = plt.hist(x, num_bins, normed=1, facecolor='orange', alpha=0.75)
+#y = mlab.normpdf(bins, mu, sigma)
+#l = plt.plot(bins, y, 'r--', linewidth=1)
+#plt.title('Probability Distribution of Heights')
+#plt.show()
