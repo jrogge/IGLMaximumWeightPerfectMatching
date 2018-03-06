@@ -26,7 +26,7 @@ var nMatrix = mat3.create();
 var mvMatrixStack = [];
 
 /** @global The angle of rotation around the y axis */
-var yRot = 45;
+var yRot = 0;
 
 /** @global The angle of rotation around the x axis */
 var xRot = -90;
@@ -40,6 +40,8 @@ vec3.set(transformVec,0.0,0.0,-2.0);
 /** @global An object holding the geometry for a 3D terrain */
 var myTerrain;
 
+/** @global the order of the Aztec diamond we're interested in */
+var meshSize = 3;
 
 // View parameters
 /** @global Location of the camera in world coordinates */
@@ -65,7 +67,7 @@ var lSpecular =[0,0,0];
 /** @global Ambient material color/intensity for Phong reflection */
 var kAmbient = [1.0,1.0,1.0];
 /** @global Diffuse material color/intensity for Phong reflection */
-var kTerrainDiffuse = [205.0/255.0,163.0/255.0,63.0/255.0];
+var kTerrainDiffuse = [255.0/255.0,255.0/255.0,255.0/255.0];
 /** @global Specular material color/intensity for Phong reflection */
 var kSpecular = [0.0,0.0,0.0];
 /** @global Shininess exponent for Phong reflection */
@@ -289,7 +291,7 @@ function setLightUniforms(loc,a,d,s) {
  * Populate buffers with data
  */
 function setupBuffers() {
-    myTerrain = new Terrain(10,-0.5,0.5,-0.5,0.5);
+    myTerrain = new Terrain(meshSize,-0.5,0.5,-0.5,0.5);
     myTerrain.loadBuffers();
 }
 
@@ -365,6 +367,7 @@ function draw() {
  */
 function tick() {
     requestAnimFrame(tick);
+    yRot += 0.25;
     draw();
 }
 

@@ -25,6 +25,7 @@
     uniform float uShininess;
     
     varying vec4 vColor;
+    varying vec3 calcDiffColor;
 
     void main(void) {
     
@@ -56,10 +57,28 @@
     
     float specularLightWeightning = pow(rdotv, uShininess);
 
+    if (aVertexPosition.z < 0.3) {
+        calcDiffColor.r = 0.0;
+        calcDiffColor.g = 0.0;
+        calcDiffColor.b = 1.0;
+    } else if (aVertexPosition.z < 0.6) {
+        calcDiffColor.r = 0.0;
+        calcDiffColor.g = 1.0;
+        calcDiffColor.b = 0.0;
+    } else {
+        calcDiffColor.r = 1.0;
+        calcDiffColor.g = 0.0;
+        calcDiffColor.b = 0.0;
+    }
+
+    //calcDiffColor.r = (aVertexPosition.z*aVertexPosition.z)*0.0 + 2.0 * aVertexPosition.z* (1.0 - aVertexPosition.z)*0.0 + (1.0 - aVertexPosition.z)*(1.0 - aVertexPosition.z)*1.0;
+    //calcDiffColor.g = (aVertexPosition.z*aVertexPosition.z)*0.0 + 2.0 * aVertexPosition.z* (1.0 - aVertexPosition.z)*1.0 + (1.0 - aVertexPosition.z)*(1.0 - aVertexPosition.z)*1.0;
+    //calcDiffColor.b = (aVertexPosition.z*aVertexPosition.z)*1.0 + 2.0 * aVertexPosition.z* (1.0 - aVertexPosition.z)*0.0 + (1.0 - aVertexPosition.z)*(1.0 - aVertexPosition.z)*1.0;
     // Sum up all three reflection components and send to the fragment shader
-    vColor = vec4(((uAmbientLightColor*uKAmbient)
-                + (uDiffuseLightColor*uKDiffuse) * diffuseLightWeightning
-                + ((uSpecularLightColor*uKSpecular) * specularLightWeightning)),1.0);
+    //vColor = vec4(((uAmbientLightColor*uKAmbient)
+    //          + (calcDiffColor*uKDiffuse) * diffuseLightWeightning
+    //          + ((uSpecularLightColor*uKSpecular) * specularLightWeightning)),1.0);
+    vColor = vec4(calcDiffColor, 1.0);
     gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
     }
 </script>
@@ -75,7 +94,7 @@ void main(void) {
 <script src="gl-matrix-min.js"></script> 
 <script src="webgl-utils.js"></script> 
 <script src="Terrain.js"></script>  
-<script src="HelloTerrain.js"></script>   
+<script src="boilerplate.js"></script>   
 <body onload="startup();">
  <canvas id="myGLCanvas" width="800" height="800"></canvas>
     <form id="input_form">
