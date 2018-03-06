@@ -121,7 +121,7 @@ def expected_surface_parallel(n, samples, num_process):
 #height(17, weighted=True, visual=True)
 #X, Y, Z = expected_surface(15, 30)
 #plot(X, Y, Z)
-X, Y, Z = expected_surface_parallel(20, 30, 5)
+X, Y, Z = expected_surface_parallel(15, 30, 5)
 plot(X, Y, Z)
 
 
