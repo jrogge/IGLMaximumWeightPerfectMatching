@@ -107,8 +107,6 @@ def expected_surface_parallel(n, samples, num_process):
 		p.start()
 
 	X, Y, Z = queue.get()
-
-	processes[0].join()
 	for i in range(1, len(processes)):
 		Xi, Yi, Zi = queue.get()
 		h.append(Zi)
