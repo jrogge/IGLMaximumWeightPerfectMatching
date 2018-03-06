@@ -6,6 +6,8 @@ import math
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from multiprocessing import Process, Queue
+import numpy as np
+import matplotlib.mlab as mlab
 
 '''
 Function to visualize the domino tiling on our Aztec diamond
@@ -93,6 +95,7 @@ Does the expected_surface function in parallel
 '''
 def expected_surface_parallel(n, samples, num_process):
 	processes = []
+	h = []
 	rem_process = num_process
 	rem_samples = samples
 	queue = Queue()
@@ -104,15 +107,15 @@ def expected_surface_parallel(n, samples, num_process):
 		p.start()
 
 	X, Y, Z = queue.get()
-
-	processes[0].join()
 	for i in range(1, len(processes)):
 		Xi, Yi, Zi = queue.get()
+		h.append(Zi)
 		Z += Zi
 
 	for process in processes:
 		process.join()
 
+	expected_surface_parallel.h = h
 	return X, Y, Z/samples
 
 
@@ -121,7 +124,31 @@ def expected_surface_parallel(n, samples, num_process):
 #height(17, weighted=True, visual=True)
 #X, Y, Z = expected_surface(15, 30)
 #plot(X, Y, Z)
-X, Y, Z = expected_surface_parallel(15, 30, 5)
+X, Y, Z = expected_surface_parallel(15, 30, 10)
 plot(X, Y, Z)
 
 
+
+'''
+Graph - Distribution of Heights
+'''
+h = expected_surface_parallel.h
+h = np.sum(h, axis=1)
+fig = plt.figure()
+plt.hist(h)
+plt.title('Distribution of Heights')
+plt.show()
+'''
+Graph - Probability distribution of Heights
+'''
+fig = plt.figure()
+h_sorted = np.sort(h)
+mu = np.mean(h_sorted) 
+sigma = np.std(h_sorted) 
+x = mu + sigma * np.random.randn(10000)
+num_bins = 10
+n, bins, patches = plt.hist(x, num_bins, normed=1, facecolor='orange', alpha=0.75)
+y = mlab.normpdf(bins, mu, sigma)
+l = plt.plot(bins, y, 'r--', linewidth=1)
+plt.title('Probability Distribution of Heights')
+plt.show()
