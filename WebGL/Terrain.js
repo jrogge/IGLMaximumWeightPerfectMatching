@@ -1,4 +1,4 @@
-var heightMap = [0.0 ,  0.0769230769231 ,  0.153846153846 ,  0.230769230769 ,  0.307692307692 ,  0.384615384615 ,  0.461538461538 ,  0.538461538462 ,  0.615384615385 ,  0.692307692308 ,  0.769230769231 ,  0.846153846154 ,  0.923076923077];
+var heightMap = [0.0 , 0.0243902439024 , 0.0487804878049 , 0.0731707317073 , 0.0975609756098 , 0.121951219512 , 0.146341463415 , 0.170731707317 , 0.19512195122 , 0.219512195122 , 0.243902439024 , 0.268292682927 , 0.292682926829 , 0.317073170732 , 0.341463414634 , 0.365853658537 , 0.390243902439 , 0.414634146341 , 0.439024390244 , 0.463414634146 , 0.487804878049 , 0.512195121951 , 0.536585365854 , 0.560975609756 , 0.585365853659 , 0.609756097561 , 0.634146341463 , 0.658536585366 , 0.682926829268 , 0.707317073171 , 0.731707317073 , 0.756097560976 , 0.780487804878 , 0.80487804878 , 0.829268292683 , 0.853658536585 , 0.878048780488 , 0.90243902439 , 0.926829268293 , 0.951219512195 , 0.975609756098];
 
 /**
  * @fileoverview Terrain - A simple 3D terrain using WebGL
@@ -252,12 +252,13 @@ populateHeights()
     var midVal = this.div / 2.0
     // 0 is an odd edge case, handle manually
     this.setVertex([0, 0, heightMap[0]], midVal, midVal);
+    console.log("mid val: ", midVal);
     counter++;
     var halfDiv = this.div / 2.0;
-    for (var i = 1; i < this.div; i++) {
+    for (var i = 1; i <= halfDiv; i++) {
+        console.log("i: ", i);
         var curr = [];
         var x = -42;
-        //for (var x = i; x >= (-1 * i); x--) {
         // TODO: do this better
         for (var y = 0; y < i; y++) {
             x = i - y;
@@ -266,9 +267,9 @@ populateHeights()
             this.getVertex(curr, yTrans, xTrans);
             this.setVertex([curr[0], curr[1], heightMap[counter]], yTrans,
                     xTrans);
+            console.log(heightMap[counter]);
+            curr = []; // getVertex pushes to array, need to flush it each time
             counter++;
-            console.log("one x: ", x, " y: ", y);
-            console.log("counter:", counter);
         }
         for (var y = i; y > 0; y--) {
             x = y - i;
@@ -277,22 +278,22 @@ populateHeights()
             this.getVertex(curr, yTrans, xTrans);
             this.setVertex([curr[0], curr[1], heightMap[counter]], yTrans,
                     xTrans);
+            console.log(heightMap[counter]);
+            curr = [];
             counter++;
-            console.log("two x: ", x, " y: ", y);
-            console.log("counter:", counter);
         }
-        //for (var x = (-1 * i); x <= i; x++) {
         // TODO: do this better
         //var xTrans = x + halfDiv; // hacky way to properly align
         for (var y = 0; y > -1 * i; y--) {
             x = Math.abs(y) - i;
+            var xTrans = x + halfDiv; // hacky way to properly align
             var yTrans = y + halfDiv; // hacky way to properly align
             this.getVertex(curr, yTrans, xTrans);
             this.setVertex([curr[0], curr[1], heightMap[counter]], yTrans,
                     xTrans);
+            console.log(heightMap[counter]);
+            curr = [];
             counter++;
-            console.log("three x: ", x, " y: ", y);
-            console.log("counter:", counter);
         }
         for (var y = -1 * i; y < 0; y++) {
             x = y + i;
@@ -301,9 +302,9 @@ populateHeights()
             this.getVertex(curr, yTrans, xTrans);
             this.setVertex([curr[0], curr[1], heightMap[counter]], yTrans,
                     xTrans);
+            console.log(heightMap[counter]);
+            curr = [];
             counter++;
-            console.log("four x: ", x, " y: ", y);
-            console.log("counter:", counter);
         }
     }
 }

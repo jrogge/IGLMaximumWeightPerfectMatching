@@ -41,7 +41,7 @@ vec3.set(transformVec,0.0,0.0,-2.0);
 var myTerrain;
 
 /** @global the order of the Aztec diamond we're interested in */
-var meshSize = 3;
+var meshSize = 6;
 
 // View parameters
 /** @global Location of the camera in world coordinates */
