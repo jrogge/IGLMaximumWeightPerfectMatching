@@ -56,6 +56,9 @@ def loadData(heights, order):
 '''
 Displays the height function of the Aztec diamond with fixed point and black square
 See vertexGraphs height map function for more details
+X, Y, and Z are returned such that for any point, X[i], Y[i], and Z[i] are paired
+The order of the array follows the order of traversal in the vertexGraph.py file
+See traversal_example.png in the pictures folder for an example
 '''
 def height(n, weighted=False, visual=False, test_time=False):
         dg = dominoGraph.DominoGraph(n, weighted=weighted)
