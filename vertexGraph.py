@@ -151,6 +151,20 @@ class VertexGraph:
 			
 				return X, Y, Z, h, curX, curY, count
 
+	'''
+	Gets the midpoints of every edge and returns the list of points
+	'''
+	def get_midpoints(self):
+		edges = self.G.edges()
+		i = 0
+		midpoints = np.zeros(len(edges), dtype=('f8, f8'))
+		for edge in edges:
+			(x1, y1), (x2, y2) = edge
+			midpoints[i][0] = (x1 + x2)/2
+			midpoints[i][1] = (y1 + y2)/2
+			i+=1
+		return midpoints
+
 
 	'''
 	Plots the figure and displays it
