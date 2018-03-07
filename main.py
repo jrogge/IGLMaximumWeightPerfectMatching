@@ -9,6 +9,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from multiprocessing import Process, Queue
 from pandas import DataFrame
+from scipy import interpolate
 
 '''
 Function to print out data to an Excel file
@@ -167,15 +168,30 @@ def expected_surface_parallel(n, samples, num_process):
 	expected_surface_parallel.h = h
 	return X, Y, Z/samples
 
+'''
+Function to get the midpoints for every edge in our vertex graph
+Can probably do this in a better way...
+'''
+def find_midpoints(n):
+	vg = vertexGraph.VertexGraph(n)
+	return vg.get_midpoints()
+
+'''
+Interpolates points and returns the associated function
+This is used to approximate the height at different points where
+we have no vertices for
+'''
+def interpolate_points(X, Y, Z, kind='cubic'):
+	return interpolate.interp2d(X, Y, Z, kind=kind)
 
 #get_time_performances_to(25)
 #parallel_time_to(25, 5)
 #height(18, weighted=True, visual=False)
 #X, Y, Z = expected_surface(15, 30)
 #plot(X, Y, Z)
-X, Y, Z = expected_surface_parallel(15, 30, 10)
+X, Y, Z = expected_surface_parallel(15, 20, 10)
 plot(X, Y, Z)
-save_to_excel("test.xls", X, Y, Z)
+#print(interpolate_points(X, Y, Z, kind='quintic'))
 #
 #
 #
