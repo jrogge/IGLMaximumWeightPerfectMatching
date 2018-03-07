@@ -1,13 +1,23 @@
 import dominoGraph
 import vertexGraph
 import time
+import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.mlab as mlab
 import math
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from multiprocessing import Process, Queue
-import numpy as np
-import matplotlib.mlab as mlab
+from pandas import DataFrame
+
+'''
+Function to print out data to an Excel file
+This takes in an filename, sheet name, X, Y, and Z coordinates
+Add the extension for the file in filename
+'''
+def save_to_excel(filename, X, Y, Z, sheet_name='sheet1'):
+	df = DataFrame({'X': X, 'Y': Y, 'Heights (Z)': Z})
+	df.to_excel(filename, sheet_name = sheet_name, index=False)
 
 '''
 Function to visualize the domino tiling on our Aztec diamond
@@ -61,13 +71,13 @@ The order of the array follows the order of traversal in the vertexGraph.py file
 See traversal_example.png in the pictures folder for an example
 '''
 def height(n, weighted=False, visual=False, test_time=False):
-        dg = dominoGraph.DominoGraph(n, weighted=weighted)
+	dg = dominoGraph.DominoGraph(n, weighted=weighted)
 	vg = vertexGraph.VertexGraph(n)
 	avoid_edges = dg.get_avoid_edges()
+	X, Y, Z = vg.height_map(avoid_edges)
 	if visual:
 		visualize(dg, vg, avoid_edges)
-	X, Y, Z = vg.height_map(avoid_edges)
-        loadData(Z, n)
+		loadData(Z, n)
 
 	if not test_time:
 		plot(X, Y, Z)
@@ -160,11 +170,12 @@ def expected_surface_parallel(n, samples, num_process):
 
 #get_time_performances_to(25)
 #parallel_time_to(25, 5)
-height(18, weighted=True, visual=False)
+#height(18, weighted=True, visual=False)
 #X, Y, Z = expected_surface(15, 30)
 #plot(X, Y, Z)
-#X, Y, Z = expected_surface_parallel(15, 30, 10)
-#plot(X, Y, Z)
+X, Y, Z = expected_surface_parallel(15, 30, 10)
+plot(X, Y, Z)
+save_to_excel("test.xls", X, Y, Z)
 #
 #
 #
