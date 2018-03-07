@@ -1,10 +1,20 @@
 import utils
 
 n = 15
-X, Y, Z = utils.expected_surface_parallel(n, 20, 5)
-utils.plot(X, Y, Z)
-xi, yi, zi = utils.interpolate_grid(n, X, Y, Z, method='cubic')
-utils.plot(xi, yi, zi)
+X, Y, Z = utils.expected_surface_parallel(n, 90, 5)
+#utils.plot(X, Y, Z)
+X_int, Y_int, Z_int = utils.interpolate_grid(n, X, Y, Z, method='cubic')
+utils.plot(X_int, Y_int, Z_int)
+X_n, Y_n, Z_n = utils.transform(n, X_int, Y_int, Z_int)
+# for i in range(len(X_n)):
+# 	if(Z_n[i] > 0.7):
+# 		print(X_n[i], Y_n[i], Z_n[i])
+utils.plot(X_n, Y_n, Z_n)
+
+
+
+
+
 
 #plot(X, Y, Z)
 #

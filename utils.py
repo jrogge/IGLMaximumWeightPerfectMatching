@@ -192,3 +192,20 @@ def interpolate_grid(n, X, Y, Z, method='linear'):
 	for i in range(len(midX)):
 		new_z[i] = zi[xi_coords[midX[i]], yi_coords[midY[i]]]
 	return midX, midY, new_z
+
+'''
+Transforms the input set of coordinate values and scales into a range of [-1, 1]
+'''
+def transform(n, X, Y, Z):
+	new_X = scale(X - Y, -1, 1)
+	new_Y = scale(X + Y, -1, 1)
+	new_Z = scale(Z, -1, 1)
+	return new_X, new_Y, new_Z
+
+'''
+Scales all the values of an array to fit into a range
+'''
+def scale(X, a, b):
+	maximum = np.max(X)
+	minimum = np.min(X)
+	return (b - a) * (X - minimum * np.ones(len(X)))/(maximum - minimum) + a * np.ones(len(X))
