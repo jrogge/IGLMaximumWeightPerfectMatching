@@ -204,6 +204,7 @@ def transform(n, X, Y, Z):
 
 '''
 Scales all the values of an array to fit into a range
+Currently probably incorrect for what we need
 '''
 def scale(X, a, b):
 	maximum = np.max(X)
