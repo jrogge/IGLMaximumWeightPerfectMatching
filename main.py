@@ -172,26 +172,40 @@ def expected_surface_parallel(n, samples, num_process):
 Function to get the midpoints for every edge in our vertex graph
 Can probably do this in a better way...
 '''
-def find_midpoints(n):
+def find_midpoints(n, tup=False):
 	vg = vertexGraph.VertexGraph(n)
-	return vg.get_midpoints()
+	return vg.get_midpoints(tup=tup)
 
 '''
 Interpolates points and returns the associated function
 This is used to approximate the height at different points where
 we have no vertices for
 '''
-def interpolate_points(X, Y, Z, kind='cubic'):
-	return interpolate.interp2d(X, Y, Z, kind=kind)
+def interpolate_grid(n, X, Y, Z, method='linear'):
+	#4n + 5 points in our grid row
+	xi = np.fromiter((-n - 1 + 0.5*i for i in range(0, 4*n+5, 1)), float)
+	zi = interpolate.griddata((X, Y), Z, (xi[None,:], xi[:,None]), method='linear')
+	midX, midY = find_midpoints(n)
+	xi_coords = {value: index for index, value in enumerate(xi)}
+	yi_coords = {value: index for index, value in enumerate(xi)}
+	new_z = np.zeros(len(midX))
+	for i in range(len(midX)):
+		new_z[i] = zi[xi_coords[midX[i]], yi_coords[midY[i]]]
+	return midX, midY, new_z
+
 
 #get_time_performances_to(25)
 #parallel_time_to(25, 5)
 #height(18, weighted=True, visual=False)
 #X, Y, Z = expected_surface(15, 30)
 #plot(X, Y, Z)
-X, Y, Z = expected_surface_parallel(15, 20, 10)
+n = 15
+X, Y, Z = expected_surface_parallel(n, 20, 5)
 plot(X, Y, Z)
-#print(interpolate_points(X, Y, Z, kind='quintic'))
+xi, yi, zi = interpolate_grid(n, X, Y, Z, method='cubic')
+plot(xi, yi, zi)
+
+#plot(X, Y, Z)
 #
 #
 #
