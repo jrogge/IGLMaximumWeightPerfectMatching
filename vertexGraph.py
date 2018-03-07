@@ -153,17 +153,29 @@ class VertexGraph:
 
 	'''
 	Gets the midpoints of every edge and returns the list of points
+	Returns a list in tuple for by default. Set tuple=False for two
+	corresponding lists
 	'''
-	def get_midpoints(self):
+	def get_midpoints(self, tup=True):
 		edges = self.G.edges()
 		i = 0
-		midpoints = np.zeros(len(edges), dtype=('f8, f8'))
-		for edge in edges:
-			(x1, y1), (x2, y2) = edge
-			midpoints[i][0] = (x1 + x2)/2
-			midpoints[i][1] = (y1 + y2)/2
-			i+=1
-		return midpoints
+		if tup:
+			midpoints = np.zeros(len(edges), dtype=('f8, f8'))
+			for edge in edges:
+				(x1, y1), (x2, y2) = edge
+				midpoints[i][0] = (x1 + x2)/2
+				midpoints[i][1] = (y1 + y2)/2
+				i+=1
+			return midpoints
+		else:
+			X = np.zeros(len(edges))
+			Y = np.zeros(len(edges))
+			for edge in edges:
+				(x1, y1), (x2, y2) = edge
+				X[i] = (x1 + x2)/2
+				Y[i] = (y1 + y2)/2
+				i+=1
+			return X, Y
 
 
 	'''
