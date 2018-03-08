@@ -102,7 +102,7 @@ class DominoGraph:
 	def get_avoid_edges(self):
 		hs = set()
 		matching = self.perfect_matching()
-		for match in matching:
+		for match in matching.items():
 			(x1, y1), (x2, y2) = match if self.weighted else (match, matching[match])
 			if(x1 == x2):
 				#vertical edge
@@ -122,8 +122,9 @@ class DominoGraph:
 	def draw(self):
 		fig = plt.figure()
 		ax = fig.gca()
-		ax.grid(True)
-		nx.draw_networkx(self.G, pos= self.mapping, ax = ax, with_labels = False, node_size = 20)
+		ax.grid(False)
+		nx.draw_networkx(self.G, pos= self.mapping, ax = ax, with_labels = False, node_size = 10)
+		plt.axis('equal')
 		plt.show()
 
 #G = DominoGraph(5)

@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+from matplotlib.colors import LinearSegmentedColormap
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Object for Aztec diamond vertex graph
@@ -181,11 +182,39 @@ class VertexGraph:
 	'''
 	Plots the figure and displays it
 	'''
-	def draw(self):
+	def draw(self, avoid_edges = set()):
 		fig = plt.figure()
 		ax = fig.gca()
-		ax.grid(True)
-		nx.draw_networkx(self.G, pos=self.mapping, ax = ax, with_labels = False, node_size = 20)
+		ax.grid(False)
+		plt.axis([-self.n, self.n, -self.n, self.n])
+		
+		# Draws the checkerboard pattern
+		k = self.n+1
+		nrows, ncols = 2*k, 2*k
+		image = np.zeros((nrows,ncols))
+		
+		if len(avoid_edges)==0:
+			nx.draw_networkx(self.G, pos=self.mapping, ax = ax, with_labels = False, node_size = 2, width=.5)
+			for i in range(1,k):
+				for j in range(k-i,k+i,2):
+					image[i,j] = 1					# i in up y-axis, j in right x-axis
+					image[nrows-1-i,ncols-1-j] = 1	# make sure nw and se boundaries are white/0
+		else:
+			for u,v in avoid_edges:
+				imin = int(min(u[0],v[0]))+k
+				jmin = int(min(u[1],v[1]))+k
+				increment = .25*((imin+jmin+k)%2)
+				if u[0]==v[0]:
+					image[jmin  ,imin-1] = .25 + increment
+					image[jmin  ,imin  ] = .25 + increment
+				else:
+					image[jmin-1,imin  ] = .75 + increment
+					image[jmin  ,imin  ] = .75 + increment
+		
+		colors = [(1,1,1),(1, 0, 0), (0, 0, 1), (0, 1, 0), (0,0,0)]	#W->R->B->G->K
+		my_cmap = LinearSegmentedColormap.from_list('my_list', colors, N=5)
+		plt.matshow(image,0, cmap=my_cmap, origin = 'lower', extent=(-k,k,-k,k))
+		plt.axis('equal')
 		plt.show()
 
 #G = VertexGraph(10)
