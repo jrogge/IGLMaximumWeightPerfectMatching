@@ -25,9 +25,10 @@ Function to visualize the domino tiling on our Aztec diamond
 Only effective for seeing for cases strictly less than 18
 '''
 def visualize(dg, vg, avoid_edges):
-	for edge in avoid_edges:
-		vg.remove_edge(edge)
-	vg.draw()
+#	for edge in avoid_edges:
+#		vg.remove_edge(edge)
+#	Should not remove edges, as these will affect the graph
+	vg.draw(avoid_edges)
 
 '''
 Push height data into the javascript file to be visualized
