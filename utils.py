@@ -85,10 +85,11 @@ def height(n, weighted=False, visual=False, test_time=False):
 		plot(X, Y, Z)
 	return X, Y, Z
 
-def plot(X,Y, Z):
+def plot(X,Y, Z, title):
 	fig = plt.figure()
 	ax = fig.gca(projection='3d')
 	ax.plot_trisurf(X, Y, Z, linewidth=0.2, antialiased=True, shade=True, cmap=cm.coolwarm)
+	plt.title(title)
 	plt.show()
 
 
