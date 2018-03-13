@@ -1,15 +1,22 @@
 import utils
 
 n = 15
-X, Y, Z = utils.expected_surface_parallel(n, 90, 5)
-#utils.plot(X, Y, Z)
+X, Y, Z = utils.expected_surface_parallel(n, 30, 5)
+#utils.plot(X, Y, Z,"Height Function")
+X1,Y1,Z1 = utils.transform(n,X,Y,Z)
+#utils.plot(X1,Y1,Z1,"Height Function range(-1,1)")
+
 X_int, Y_int, Z_int = utils.interpolate_grid(n, X, Y, Z, method='cubic')
-utils.plot(X_int, Y_int, Z_int)
+utils.plot(X_int, Y_int, Z_int,"Height Function by Midpoints")
 X_n, Y_n, Z_n = utils.transform(n, X_int, Y_int, Z_int)
 # for i in range(len(X_n)):
 # 	if(Z_n[i] > 0.7):
 # 		print(X_n[i], Y_n[i], Z_n[i])
-utils.plot(X_n, Y_n, Z_n)
+utils.plot(X_n, Y_n, Z_n,"height Function by Midpoints range(-1,1)")
+err = Z_n-(X_n*Y_n)
+utils.plot(X_n,Y_n,err,"Error of Height Function")
+innerProduct = sum(Z_n)/(n**2)
+print(innerProduct)
 
 
 
