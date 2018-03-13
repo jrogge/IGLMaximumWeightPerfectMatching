@@ -1,7 +1,7 @@
 import utils
 
 n = 15
-X, Y, Z = utils.expected_surface_parallel(n, 30, 5)
+X, Y, Z = utils.expected_surface_parallel(n, 90, 5)
 #utils.plot(X, Y, Z,"Height Function")
 X1,Y1,Z1 = utils.transform(n,X,Y,Z)
 #utils.plot(X1,Y1,Z1,"Height Function range(-1,1)")
