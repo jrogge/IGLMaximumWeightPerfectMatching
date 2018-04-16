@@ -11,20 +11,37 @@ class GemGraph:
 	'''
 	Defined by D_n = {(x,y) in Z^2 : |x|+|y| \leq a*n, |y| \leq n}
 	'''
-	def __init__(self, n, a):
+	def __init__(self, n, a, compare=False):
 		if a < 0:
 			a = -a
 		self.a = n
 		self.n = n
-		#keep track of nodes for adding layers horizontally
-		self.highest_right = (0, n)
-		#Height n, width n
-		vg = vertexGraph.VertexGraph(n - 1)
-		self.G, self.mapping = vg.graph()
-		while self.a < a*n:
-			self.add_horizontal_layer()
-			self.a += 1
-		self.a = a/n
+		if not compare:
+			#keep track of nodes for adding layers horizontally
+			self.highest_right = (0, n)
+			#Height n, width n
+			vg = vertexGraph.VertexGraph(n - 1)
+			self.G, self.mapping = vg.graph()
+			while self.a < a*n:
+				self.add_horizontal_layer()
+				self.a += 1
+			self.a = a/n
+		else:
+			vals = [x for x in range(-a*n, a*n + 1)]
+			self.mapping = dict()
+			nodes = [(x, y) for x in vals for y in vals if (abs(x) + abs(y) <= a*n and abs(y) <= n)]
+			hs = set(nodes)
+			self.G = nx.Graph()
+			self.G.add_nodes_from(nodes)
+			for node in nodes:	
+				self.mapping[node] = node	
+				(x, y) = node	
+				if (x - 1, y) in hs:	
+					self.G.add_edge((x, y), (x - 1, y))	
+				if (x, y - 1) in hs:	
+					self.G.add_edge((x, y), (x, y - 1))
+
+
 
 	'''
 	Adds a layer to 
