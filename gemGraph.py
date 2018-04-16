@@ -128,6 +128,7 @@ class GemGraph:
 
 	'''
 	Plots the figure and displays it
+	Ignore imbalanced checkboard for now
 	'''
 	def draw(self, avoid_edges = set()):
 		fig = plt.figure()
