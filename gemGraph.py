@@ -111,6 +111,10 @@ class GemGraph:
 	'''
 	def height_wrap(self, matching, X, Y, Z, n, h, curX, curY, count):
 		if(n == 0):
+			X[count] = curX
+			Y[count] = curY
+			Z[count] = h
+			count += 1
 			initX = curX
 				#take advantage of symmetry, at innermost layer (flat line)
 			while curX != -initX:
