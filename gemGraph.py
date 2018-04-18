@@ -25,7 +25,7 @@ class GemGraph:
 			while self.a < a*n:
 				self.add_horizontal_layer()
 				self.a += 1
-			self.a = a/n
+			self.a = a
 		else:
 			vals = [x for x in range(-a*n, a*n + 1)]
 			self.mapping = dict()
@@ -84,6 +84,31 @@ class GemGraph:
 		self.mapping[(-x, y)] = (-x, y)
 		self.G.add_node((-x, y))
 		self.G.add_edge((-x, y), (-x + 1, y))
+
+	'''
+	Adds a layer by growing n by one
+	'''
+	def add_layer(self):
+		x, y = self.highest_right
+		self.highest_right = (x - 1, y + 1)
+		#add the top layer
+		for i in range(-x + 1, x):
+			self.mapping[(i, y + 1)] = (i, y + 1)
+			self.mapping[(i, -y - 1)] = (i, -y - 1)
+			self.G.add_node((i, y + 1))
+			self.G.add_node((i, -y - 1))
+
+			self.G.add_edge((i, y), (i, y + 1))
+			self.G.add_edge((i, -y), (i, -y - 1))
+
+		for i in range (-x + 1, x - 1):
+			self.G.add_edge((i, y + 1), (i + 1, y + 1))
+			self.G.add_edge((i, -y - 1), (i + 1, -y - 1))
+
+		self.n+=1
+
+		for i in range(self.a):
+			self.add_horizontal_layer()
 
 
 
