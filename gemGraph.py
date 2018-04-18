@@ -25,7 +25,7 @@ class GemGraph:
 			while self.a < a*n:
 				self.add_horizontal_layer()
 				self.a += 1
-			self.a = a/n
+			self.a = a
 		else:
 			vals = [x for x in range(-a*n, a*n + 1)]
 			self.mapping = dict()
@@ -85,6 +85,31 @@ class GemGraph:
 		self.G.add_node((-x, y))
 		self.G.add_edge((-x, y), (-x + 1, y))
 
+	'''
+	Adds a layer by growing n by one
+	'''
+	def add_layer(self):
+		x, y = self.highest_right
+		self.highest_right = (x - 1, y + 1)
+		#add the top layer
+		for i in range(-x + 1, x):
+			self.mapping[(i, y + 1)] = (i, y + 1)
+			self.mapping[(i, -y - 1)] = (i, -y - 1)
+			self.G.add_node((i, y + 1))
+			self.G.add_node((i, -y - 1))
+
+			self.G.add_edge((i, y), (i, y + 1))
+			self.G.add_edge((i, -y), (i, -y - 1))
+
+		for i in range (-x + 1, x - 1):
+			self.G.add_edge((i, y + 1), (i + 1, y + 1))
+			self.G.add_edge((i, -y - 1), (i + 1, -y - 1))
+
+		self.n+=1
+
+		for i in range(self.a):
+			self.add_horizontal_layer()
+
 
 
 
@@ -101,20 +126,136 @@ class GemGraph:
 	The matching comes in as a data structure
 	'''
 	def height_map(self, matching):
-		pass
+		X = np.zeros(self.G.number_of_nodes())
+		Y = np.zeros(self.G.number_of_nodes())
+		Z = np.zeros(self.G.number_of_nodes())
+		return self.height_wrap(matching, X, Y, Z, self.n, 0, self.n * self.a, 0, 0)
 	
 	'''
 	Wrapper function for finding the height function of our Aztec diamond via layers
 	'''
 	def height_wrap(self, matching, X, Y, Z, n, h, curX, curY, count):
-		pass
+		if(n == 0):
+			X[count] = curX
+			Y[count] = curY
+			Z[count] = h
+			count += 1
+			initX = curX
+				#take advantage of symmetry, at innermost layer (flat line)
+			while curX != -initX:
+				curX -= 1
+				#current square is black
+				h = h - 3 if ((curX, curY), (curX + 1, curY)) in matching or ((curX + 1, curY), (curX, curY)) in matching else h + 1
+				X[count] = curX
+				Y[count] = curY
+				Z[count] = h
+				count += 1
+				curX += -1
+				h = h + 3 if ((curX, curY), (curX + 1, curY)) in matching or ((curX + 1, curY), (curX, curY)) in matching else h - 1
+				X[count] = curX
+				Y[count] = curY
+				Z[count] = h
+				count += 1
+			return X, Y, Z
+
+		X, Y, Z, h, curX, curY, count = self.traverse(matching, X, Y, Z, n, h, curX, curY, count, -1, 1)
+		return self.height_wrap(matching, X, Y, Z, n - 1, h, curX, 0, count)
 
 	'''
 	Helper function to traverse each layer of the Aztec diamond
 	The function calls itself to travel each side of the diamond
 	'''
 	def traverse(self, matching, X, Y, Z, n, h, curX, curY, count, dirX, dirY):
-		pass
+		if(n <= 0):
+			return X, Y, Z, h, curX, curY, count
+		X[count] = curX
+		Y[count] = curY
+		Z[count] = h
+		count += 1
+
+		if (dirX == -1 and dirY == 1) or (dirX == 1 and dirY == -1):
+			#top right and starting by moving left or bottom left moving right
+			for i in range(n):
+				h = h - 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h + 1
+				curX += dirX
+				X[count] = curX
+				Y[count] = curY
+				Z[count] = h
+				count += 1
+				
+				h = h - 3 if ((curX, curY), (curX, curY + dirY)) in matching or ((curX, curY + dirY), (curX, curY)) in matching else h + 1
+				curY += dirY
+				if(i != n - 1):
+					X[count] = curX
+					Y[count] = curY
+					Z[count] = h
+					count += 1
+				
+			if(dirX == -1 and dirY == 1):
+				return self.traverse(matching, X, Y, Z, n, h, curX, curY, count, -1, 0)
+			else:
+				return self.traverse(matching, X, Y, Z, n, h, curX, curY, count, 1, 0)
+		elif (dirX == -1 and dirY == -1) or (dirX == 1 and dirY == 1):
+			#top left or bottom right side
+			for i in range(n):
+				h = h + 3 if ((curX, curY), (curX, curY + dirY)) in matching or ((curX, curY + dirY), (curX, curY)) in matching else h - 1
+				curY += dirY
+				if(i != n - 1):
+					X[count] = curX
+					Y[count] = curY
+					Z[count] = h
+					count += 1
+				
+				h = h + 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h - 1
+				curX += dirX
+				if(i != n - 1):
+					X[count] = curX
+					Y[count] = curY
+					Z[count] = h
+					count+= 1
+				
+			if(dirX == -1 and dirY == -1):
+				return self.traverse(matching, X, Y, Z, n, h, curX, curY, count, 1, -1)
+			else:
+				#sixth side, finish
+				curX -= 1 #(at (n, 0))
+				h = h - 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h + 1
+				#this assumes a > 1
+				curX -= 1 #(at (n - 1, 0))
+				h = h + 3 if ((curX, curY), (curX + dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h - 1
+			
+				return X, Y, Z, h, curX, curY, count
+		else:
+			#flat edges
+			if(dirX != 0 and dirY == 0):
+				#always starts at black square
+				initX = curX
+				#take advantage of symmetry
+				while curX != -initX:
+					curX += dirX
+					#current square is black
+					h = h - 3 if ((curX, curY), (curX - dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h + 1
+					X[count] = curX
+					Y[count] = curY
+					Z[count] = h
+					count += 1
+					curX += dirX
+					h = h + 3 if ((curX, curY), (curX - dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h - 1
+					X[count] = curX
+					Y[count] = curY
+					Z[count] = h
+					count += 1
+				#sets up position for next traversal
+				count -= 1
+				if dirX < 0:
+					return self.traverse(matching, X, Y, Z, n, h, curX, curY, count, -1, -1)
+				else:
+					return self.traverse(matching, X, Y, Z, n, h, curX, curY, count, 1, 1)
+			else:
+				print("Failed")
+				return
+
+
 
 	'''
 	Gets the midpoints of every edge and returns the list of points
