@@ -234,13 +234,13 @@ class GemGraph:
 				while curX != -initX:
 					curX += dirX
 					#current square is black
-					h = h - 3 if ((curX, curY), (curX - dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h + 1
+					h = h - 3 if ((curX, curY), (curX - dirX, curY)) in matching or ((curX - dirX, curY), (curX, curY)) in matching else h + 1
 					X[count] = curX
 					Y[count] = curY
 					Z[count] = h
 					count += 1
 					curX += dirX
-					h = h + 3 if ((curX, curY), (curX - dirX, curY)) in matching or ((curX + dirX, curY), (curX, curY)) in matching else h - 1
+					h = h + 3 if ((curX, curY), (curX - dirX, curY)) in matching or ((curX - dirX, curY), (curX, curY)) in matching else h - 1
 					X[count] = curX
 					Y[count] = curY
 					Z[count] = h

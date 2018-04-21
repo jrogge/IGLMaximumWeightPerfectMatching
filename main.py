@@ -1,5 +1,6 @@
 import utils
 import gemGraph
+import gemFaceGraph
 
 def aztec(n, num_surfaces, num_parallel):
 	X, Y, Z = utils.expected_surface_parallel(n, num_surfaces, num_parallel)
@@ -21,9 +22,17 @@ def aztec(n, num_surfaces, num_parallel):
 
 def test_gem(n, a):
 	gg = gemGraph.GemGraph(n, a)
-	gg.draw()
+	gs = gemFaceGraph.GemFaceGraph(n, a)
+	matching = gs.get_avoid_edges()
+	X, Y, Z = gg.height_map(matching)
+	#utils.visualize(gs, gg, matching)
+	utils.plot(X, Y, Z, "(20,3)-gem")
 
-test_gem(4, 3)
+
+	X, Y, Z = utils.expected_surface_parallel(20, 60, 5, a=2, graph='gem')
+	utils.plot(X, Y, Z, "Expected (20, 3)-gem")
+
+test_gem(20, 3)
 
 
 

@@ -1,5 +1,7 @@
 import dominoGraph
 import vertexGraph
+import gemGraph
+import gemFaceGraph
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -72,9 +74,13 @@ X, Y, and Z are returned such that for any point, X[i], Y[i], and Z[i] are paire
 The order of the array follows the order of traversal in the vertexGraph.py file
 See traversal_example.png in the pictures folder for an example
 '''
-def height(n, weighted=False, visual=False, test_time=False):
-	dg = dominoGraph.DominoGraph(n, weighted=weighted)
-	vg = vertexGraph.VertexGraph(n)
+def height(n, a=0, graph='aztec', weighted=False, visual=False, test_time=False):
+	if(graph=='gem'):
+		dg = gemFaceGraph.GemFaceGraph(n, a)
+		vg = gemGraph.GemGraph(n, a)
+	else:
+		dg = dominoGraph.DominoGraph(n, weighted=weighted)
+		vg = vertexGraph.VertexGraph(n)
 	avoid_edges = dg.get_avoid_edges()
 	X, Y, Z = vg.height_map(avoid_edges)
 	if visual:
@@ -97,9 +103,12 @@ def plot(X,Y, Z, title):
 '''	
 Prints time performance for a graph of size n
 '''
-def get_time_performance(n):
+def get_time_performance(n, a=0, graph='aztec'):
 	startTime = time.time()
-	height(n, visual=False, weighted=True, test_time=True)
+	if graph=='gem':
+		height(n, a, graph, visual=False, weighted=True, test_time=True)
+	else:
+		height(n, visual=False, weighted=True, test_time=True)
 	print(n, time.time() - startTime)
 
 '''
@@ -131,10 +140,16 @@ def parallel_time_to(n, num_process):
 '''
 Computes the average of the random surfaces according to corresponding values
 '''
-def expected_surface(n, samples, parallel=False, queue=None):
-	X, Y, Z = height(n, weighted=True, test_time=True)
+def expected_surface(n, samples, a=0, graph='aztec', parallel=False, queue=None):
+	if graph == 'gem':
+		X, Y, Z = height(n, a, graph, weighted=True, test_time=True)
+	else:
+		X, Y, Z = height(n, weighted=True, test_time=True)
 	for i in range(samples - 1):
-		Xi, Yi, Zi = height(n, weighted=True, test_time=True)
+		if graph == 'gem':
+			Xi, Yi, Zi = height(n, a, graph, weighted=True, test_time=True)
+		else:
+			Xi, Yi, Zi = height(n, weighted=True, test_time=True)
 		Z += Zi
 	if parallel:
 		queue.put((X, Y, Z))
@@ -145,14 +160,14 @@ def expected_surface(n, samples, parallel=False, queue=None):
 '''
 Does the expected_surface function in parallel
 '''
-def expected_surface_parallel(n, samples, num_process):
+def expected_surface_parallel(n, samples, num_process, a=0, graph='aztec'):
 	processes = []
 	h = []
 	rem_process = num_process
 	rem_samples = samples
 	queue = Queue()
 	for i in range(num_process):
-		p = Process(target=expected_surface, args=(n, math.ceil(rem_samples/rem_process), True, queue))
+		p = Process(target=expected_surface, args=(n, math.ceil(rem_samples/rem_process), a, graph, True, queue))
 		rem_samples -= math.ceil(rem_samples/rem_process)
 		rem_process -= 1
 		processes.append(p)
