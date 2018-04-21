@@ -14,6 +14,7 @@ class GemFaceGraph:
         self.n = n
         self.graph = nx.Graph()
         self.weighted = weighted
+        self.max_weight=max_weight
         self.mapping = dict()
         for x in range(-a*n, a*n+1):
             for y in range(-n, n):
@@ -45,18 +46,33 @@ class GemFaceGraph:
 
 
     def add_neighbors(self, x, y):
-        if ((abs(x+1) + abs(y)) < self.prod and abs(y) < self.n):
-            self.graph.add_edge((x,y), (x+1, y))
-            #self.mapping[(x+1, y)] = (x+1, y)
-        if ((abs(x-1) + abs(y)) < self.prod and abs(y) < self.n):
-            self.graph.add_edge((x,y), (x-1, y))
-            #self.mapping[(x-1, y)] = (x-1, y)
-        if ((abs(x) + abs(y+1)) < self.prod and abs(y+1) < self.n):
-            self.graph.add_edge((x,y), (x, y+1))
-            #self.mapping[(x, y+1)] = (x, y+1)
-        if ((abs(x) + abs(y-1)) < self.prod and abs(y-1) < self.n):
-            self.graph.add_edge((x,y), (x, y-1))
-            #self.mapping[(x, y-1)] = (x, y-1)
+        if self.weighted:
+            if ((abs(x+1) + abs(y)) < self.prod and abs(y) < self.n):
+                self.graph.add_edge((x,y), (x+1, y), weight=random.randint(1, self.max_weight + 1))
+                #self.mapping[(x+1, y)] = (x+1, y)
+            if ((abs(x-1) + abs(y)) < self.prod and abs(y) < self.n):
+                self.graph.add_edge((x,y), (x-1, y), weight=random.randint(1, self.max_weight + 1))
+                #self.mapping[(x-1, y)] = (x-1, y)
+            if ((abs(x) + abs(y+1)) < self.prod and abs(y+1) < self.n):
+                self.graph.add_edge((x,y), (x, y+1), weight=random.randint(1, self.max_weight + 1))
+                #self.mapping[(x, y+1)] = (x, y+1)
+            if ((abs(x) + abs(y-1)) < self.prod and abs(y-1) < self.n):
+                self.graph.add_edge((x,y), (x, y-1), weight=random.randint(1, self.max_weight + 1))
+                #self.mapping[(x, y-1)] = (x, y-1)
+
+        else:
+            if ((abs(x+1) + abs(y)) < self.prod and abs(y) < self.n):
+                self.graph.add_edge((x,y), (x+1, y))
+                #self.mapping[(x+1, y)] = (x+1, y)
+            if ((abs(x-1) + abs(y)) < self.prod and abs(y) < self.n):
+                self.graph.add_edge((x,y), (x-1, y))
+                #self.mapping[(x-1, y)] = (x-1, y)
+            if ((abs(x) + abs(y+1)) < self.prod and abs(y+1) < self.n):
+                self.graph.add_edge((x,y), (x, y+1))
+                #self.mapping[(x, y+1)] = (x, y+1)
+            if ((abs(x) + abs(y-1)) < self.prod and abs(y-1) < self.n):
+                self.graph.add_edge((x,y), (x, y-1))
+                #self.mapping[(x, y-1)] = (x, y-1)
 
     '''
     Finds a perfect matching. We are assuming the graph is unweighted for now.

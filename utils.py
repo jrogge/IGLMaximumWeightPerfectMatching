@@ -76,7 +76,7 @@ See traversal_example.png in the pictures folder for an example
 '''
 def height(n, a=0, graph='aztec', weighted=False, visual=False, test_time=False):
 	if(graph=='gem'):
-		dg = gemFaceGraph.GemFaceGraph(n, a)
+		dg = gemFaceGraph.GemFaceGraph(n, a, weighted=weighted)
 		vg = gemGraph.GemGraph(n, a)
 	else:
 		dg = dominoGraph.DominoGraph(n, weighted=weighted)
