@@ -53,6 +53,11 @@ class VertexGraph:
 			self.G.add_edge((-i, -self.n + i - 1), (-i + 1, -self.n + i - 1))
 			self.G.add_edge((-i, -self.n + i - 1), (-i, -self.n + i))
 
+	'''
+	Returns the underlying graph and it's mapping
+	'''
+	def graph(self):
+		return self.G, self.mapping
 
 	'''
 	Given an edge, removes the two associated edges
