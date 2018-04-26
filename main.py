@@ -20,7 +20,7 @@ def aztec(n, num_surfaces, num_parallel):
 	innerProduct = sum(Z_n)/(n**2)
 	print(innerProduct)
 
-def test_gem(n, a):
+def test_gem(n, a, samples=60, threads=5):
 	gg = gemGraph.GemGraph(n, a)
 	gs = gemFaceGraph.GemFaceGraph(n, a)
 	matching = gs.get_avoid_edges()
@@ -32,7 +32,12 @@ def test_gem(n, a):
 	X, Y, Z = utils.expected_surface_parallel(n, 60, 5, a=a, graph='gem')
 	utils.plot(X, Y, Z, "Expected ("+str(n)+","+str(a)+")-gem")
 
-test_gem(6, 2)
+utils.plot_errors(400, 10, 60, threads=5, graph='aztec')
+
+
+#utils.plot_errors(400, 5, 60, threads=5)
+#test_gem(6, 2)
+
 
 
 

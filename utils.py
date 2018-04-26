@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 import math
+import plotly.plotly as py
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from multiprocessing import Process, Queue
@@ -209,6 +210,33 @@ def interpolate_grid(n, X, Y, Z, method='linear'):
 	for i in range(len(midX)):
 		new_z[i] = zi[xi_coords[midX[i]], yi_coords[midY[i]]]
 	return midX, midY, new_z
+
+'''
+Finds the distribution of error from a given graph and it's expected graph
+'''
+def get_errors(error_samples, n, expected_g_samples, threads=5, a=0, graph='aztec'):
+	errors = np.zeros(error_samples)
+	X, Y, Z = expected_surface_parallel(n, expected_g_samples, threads, a=a, graph=graph)
+	for i in range(error_samples):
+		Xi, Yi, Zi = height(n, a=a, graph=graph, weighted=True, visual=False, test_time=True)
+		for j in range(len(Zi)):
+			errors[i] += abs(Zi[j]-Z[j])
+	return errors
+
+'''
+Plots the total error in the form of a histogram
+'''
+def plot_errors(error_samples, n, expected_g_samples, threads=5, a=0, graph='aztec'):
+	errors = get_errors(error_samples, n, expected_g_samples, threads=threads, a=a, graph=graph)
+	plt.hist(errors)
+	if graph == 'aztec':
+		plt.title("Histogram of errors for Aztec " + str(n))
+	else:
+		plt.title("Histogram of errors for Gem (" + str(n) + "," + str(a) + ")")
+	plt.xlabel("Error")
+	plt.ylabel("Frequency")
+	plt.show()
+
 
 '''
 Transforms the input set of coordinate values and scales into a range of [-1, 1]
