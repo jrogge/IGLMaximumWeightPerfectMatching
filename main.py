@@ -26,13 +26,13 @@ def test_gem(n, a):
 	matching = gs.get_avoid_edges()
 	X, Y, Z = gg.height_map(matching)
 	#utils.visualize(gs, gg, matching)
-	utils.plot(X, Y, Z, "(10,3)-gem")
+	utils.plot(X, Y, Z, "("+str(n)+","+str(a)+")-gem")
 
 
 	X, Y, Z = utils.expected_surface_parallel(n, 60, 5, a=a, graph='gem')
-	utils.plot(X, Y, Z, "Expected (10, 2)-gem")
+	utils.plot(X, Y, Z, "Expected ("+str(n)+","+str(a)+")-gem")
 
-test_gem(10, 2)
+test_gem(6, 2)
 
 
 
